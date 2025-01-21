@@ -1,0 +1,60 @@
+import React from 'react';
+import { Route, Routes, Link } from 'react-router-dom';  // Import Link for navigation
+import HomePage from './pages/HomePage';
+import Dashboard from './pages/Dashboard';
+import StudentAdmission from './pages/StudentAdmission';
+import StudentsAttendance from './pages/StudentsAttendance';
+
+import './App.css';
+import StudentList from './pages/StudentList';
+import FileUpload from './components/FileUpload';
+//FeeManagement
+import FeeManagement from './components/FeeManagement';
+import Report from './components/Report'
+import StudentManagement from './components/StudentManagement';
+import StudentProfile from './pages/StudentProfile';
+import UploadProfileImage from './components/UploadProfileImage';
+import CardHub from './pages/CardHub';
+
+const App = () => {
+  return (
+    <div className="App">
+      <h1>Coaching Management System</h1>
+      <div className="App">
+    </div>
+      {/* Navigation Buttons */}
+      <nav className="navbar">
+        <Link to="/" className="nav-link">Home</Link>
+        <Link to="/dashboard" className="nav-link">Dashboard</Link>
+
+        <Link to="/student-attendance" className="nav-link">Student Attendance</Link>
+        <Link to="/student-admission" className="nav-link">Student Admission</Link>
+        <Link to="/student-list" className="nav-link">Student List</Link>
+        <Link to="/fee-management" className="nav-link">Fee Collection</Link>
+        <Link to="/report" className="nav-link">Fee Report</Link>
+        <Link to="/student-management" className="nav-link">Student Management Mini</Link>
+        <Link to="/student-profile" className="nav-link">Student Profile</Link>
+        {/* <Link to="/upload-profile-image" className="nav-link">Upload Profile Image</Link> */}
+        <Link to="/download-upload-data" className="nav-link">Download-Upload</Link>
+      </nav>
+
+      <Routes>
+        <Route exact path="/" element={<HomePage />} />
+        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/student-admission" element={<StudentAdmission />} />
+        <Route path="/student-attendance" element={<StudentsAttendance />} />
+        <Route path="/student-list" element={<StudentList />} />
+        <Route path="/download-upload-data" element={<FileUpload />} />
+        <Route path="/fee-management" element={<FeeManagement />} />
+        <Route path="/report" element={<Report />} />
+        <Route path="/student-management" element={<StudentManagement />} />
+        <Route path="/student-profile" element={<StudentProfile />} />
+        {/* <Route path="/upload-profile-image" element={<UploadProfileImage />} /> */}
+        <Route path="/card-hub" element={<CardHub />} />
+      </Routes>
+    </div>
+    
+  );
+};
+
+export default App;
