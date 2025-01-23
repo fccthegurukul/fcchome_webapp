@@ -1,0 +1,118 @@
+import React, { useState, useEffect } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import "./ViewCtcCtg.css"; // Add necessary styles
+
+const ViewCtcCtg = () => {
+  const location = useLocation();
+  const navigate = useNavigate(); // For navigation to other pages
+  const [data, setData] = useState(null);
+  const [logs, setLogs] = useState([]); // For log entries
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  // Fetch CTC/CTG and log data when component mounts or FCC ID changes
+  useEffect(() => {
+    const fetchData = async () => {
+      const fccId = location.state?.fccId; // Get FCC ID from navigation state
+      if (!fccId) {
+        setError("No FCC ID provided");
+        return;
+      }
+
+      setLoading(true);
+      setError(""); // Clear previous errors
+
+      try {
+        const response = await fetch(`http://localhost:5000/get-ctc-ctg/${fccId}`);
+        const result = await response.json();
+
+        if (response.ok) {
+          setData(result.student); // Student data
+          setLogs(result.logs); // Logs from students_log table
+        } else {
+          setData(null);
+          setLogs([]);
+          setError(result.error || "Failed to fetch data");
+        }
+      } catch (err) {
+        setError("An error occurred while fetching CTC/CTG data");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [location.state]); // Depend on location state to re-run when fccId changes
+
+  return (
+    <div className="view-ctc-ctg-container">
+      <h1>View CTC/CTG</h1>
+
+      {/* Loading Indicator */}
+      {loading && <p>Loading...</p>}
+
+      {/* Error Message */}
+      {error && <p className="error">{error}</p>}
+
+      {/* Display Student Data */}
+      {data && (
+        <div className="ctc-ctg-details">
+          <p>
+            <strong>FCC ID:</strong> {data.fcc_id}
+          </p>
+          <p>
+            <strong>CTC Time:</strong>{" "}
+            {data.ctc_time ? new Date(data.ctc_time).toLocaleString() : "N/A"}
+          </p>
+          <p>
+            <strong>CTG Time:</strong>{" "}
+            {data.ctg_time ? new Date(data.ctg_time).toLocaleString() : "N/A"}
+          </p>
+          <p>
+            <strong>Task Completed:</strong> {data.task_completed ? "Yes" : "No"}
+          </p>
+        </div>
+      )}
+
+      {/* Display Student Logs */}
+      {logs.length > 0 && (
+        <div className="log-details">
+          <h2>Student Logs</h2>
+          <table>
+            <thead>
+              <tr>
+                <th>Log Date</th>
+                <th>CTC Time</th>
+                <th>CTG Time</th>
+                <th>Task Completed</th>
+              </tr>
+            </thead>
+            <tbody>
+              {logs.map((log, index) => (
+                <tr key={index}>
+                  <td>{new Date(log.log_date).toLocaleDateString()}</td>
+                  <td>
+                    {log.ctc_time ? new Date(log.ctc_time).toLocaleString() : "N/A"}
+                  </td>
+                  <td>
+                    {log.ctg_time ? new Date(log.ctg_time).toLocaleString() : "N/A"}
+                  </td>
+                  <td>{log.task_completed ? "Yes" : "No"}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+
+      {/* Back Button */}
+      <div className="button-group">
+        <button onClick={() => navigate("/student-profile")} className="back-button">
+          Back to Profile
+        </button>
+      </div>
+    </div>
+  );
+};
+
+export default ViewCtcCtg;
