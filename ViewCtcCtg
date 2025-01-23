@@ -116,3 +116,44 @@ const ViewCtcCtg = () => {
 };
 
 export default ViewCtcCtg;
+....................
+
+// Route to fetch CTC/CTG data and logs by FCC ID
+app.get("/get-ctc-ctg/:fcc_id", async (req, res) => {
+  const { fcc_id } = req.params;
+
+  try {
+    // Query to fetch student data
+    const studentQuery = `
+      SELECT fcc_id, ctc_time, ctg_time, task_completed
+      FROM students
+      WHERE fcc_id = $1;
+    `;
+
+    // Query to fetch logs
+    const logsQuery = `
+      SELECT fcc_id, ctc_time, ctg_time, task_completed, log_date
+      FROM attendance_log
+      WHERE fcc_id = $1
+      ORDER BY log_date DESC; -- Sort logs by most recent date
+    `;
+
+    // Execute queries
+    const studentResult = await pool.query(studentQuery, [fcc_id]);
+    const logsResult = await pool.query(logsQuery, [fcc_id]);
+
+    // Check if student exists
+    if (studentResult.rows.length === 0) {
+      return res.status(404).json({ error: "Student not found" });
+    }
+
+    // Return student and log data
+    res.json({
+      student: studentResult.rows[0], // Single student entry
+      logs: logsResult.rows,          // Array of log entries
+    });
+  } catch (error) {
+    console.error("Error fetching CTC/CTG data and logs:", error);
+    res.status(500).json({ error: "Failed to fetch CTC/CTG data and logs" });
+  }
+});
